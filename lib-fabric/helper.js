@@ -29,7 +29,8 @@ var Channel = require('fabric-client/lib/Channel.js');
 var CopService = require('fabric-ca-client');
 var config = require('../config.json');
 
-var hfc = require('./hfc');
+var hfc = new require('./hfc').hfc;
+var hfcClient = new require('./hfc').newHfc;
 var ORGS = hfc.getConfigSetting('network-config');
 var CONFIG_DIR = hfc.getConfigSetting('config-dir');
 
@@ -111,10 +112,11 @@ function _newClient(username, orgID){
     throw new Error('No such organisation: '+orgID);
   }
 
-  let client = new hfc(); // jshint ignore: line
+  let client = hfcClient(); // jshint ignore: line
   let cryptoSuite = hfc.newCryptoSuite();
   cryptoSuite.setCryptoKeyStore(hfc.newCryptoKeyStore({path: getKeyStoreForOrg(username, orgID)}));
   client.setCryptoSuite(cryptoSuite);
+
   return client;
 }
 
@@ -347,6 +349,7 @@ function newEventHub(peerUrl, username, orgID) {
 
   return getClientForOrg(username, orgID)
     .then(client => {
+/*
       var peerInfo = _getPeerInfoByUrl(peerUrl, orgID);
       if (!peerInfo) {
         throw new Error('Failed to find a peer matching the url: ' + peerUrl);
@@ -359,7 +362,19 @@ function newEventHub(peerUrl, username, orgID) {
         pem: Buffer.from(data).toString(),
         'ssl-target-name-override': peerInfo['server-hostname']
       });
-      return eventHub;
+*/
+
+      let peer = client.getPeersForOrg()[0];
+      return client.queryChannels(peer, true).then(resp=>{
+          let channels= resp.getChannels();
+
+          channels.forEach(channel=>{
+              const channelEventHub = channel.newChannelEventHub(peer.getName());
+              channelEventHub.connect();
+          });
+      });
+
+      // return eventHub;
     });
 }
 

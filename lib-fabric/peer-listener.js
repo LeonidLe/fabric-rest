@@ -92,7 +92,7 @@ function rotatePeers(){
 function listen(){
   return initPromise.then(function () {
 
-    //_connect();
+    _connect();
 
     //
     function _connect(){

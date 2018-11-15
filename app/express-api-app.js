@@ -21,7 +21,7 @@ var expressEnv      = require('../lib/express-env-middleware');
 
 var jwt   = require('jsonwebtoken');
 var tools = require('../lib/tools');
-var hfc   = require('../lib-fabric/hfc');
+var hfc   = require('../lib-fabric/hfc').hfc;
 var networkConfig = hfc.getConfigSetting('network-config');
 
 var helper        = require('../lib-fabric/helper.js');

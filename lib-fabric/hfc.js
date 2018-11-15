@@ -41,4 +41,19 @@ hfc.setConfigSetting('config-file', configFile);
 // var ORGS = hfc.getConfigSetting('network-config');
 // var CONFIG_DIR = hfc.getConfigSetting('config-dir');
 
-module.exports = hfc;
+function newHfc() {
+    let client = new hfc();
+
+    client.loadFromConfig(require('../network')());
+    // client.setLogger(logger);
+    // client.addConfigFile(configFile);  // this config needed for lib-fabric
+    // client.setConfigSetting('config', config);  // this config needed for client
+    // client.setConfigSetting('config-dir', configDir);
+    // client.setConfigSetting('config-file', configFile);
+    return client;
+}
+
+module.exports = {
+    hfc: hfc,
+    newHfc: newHfc
+};

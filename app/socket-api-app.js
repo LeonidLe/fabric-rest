@@ -7,7 +7,7 @@ var logger = log4js.getLogger('Socket');
 var peerListener = require('../lib-fabric/peer-listener.js');
 var tools = require('../lib/tools');
 
-var hfc = require('../lib-fabric/hfc');
+var hfc = require('../lib-fabric/hfc').hfc;
 var networkConfig = hfc.getConfigSetting('network-config');
 
 // config
