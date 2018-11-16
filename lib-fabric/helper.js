@@ -410,10 +410,15 @@ class EventHub {
         });
     }
 
-    disconnect() {
+    unregisterBlockEvent(){
         this.eventHubs.forEach(eh=> {
             eh.unregisterBlockEvent(eh._myListenerId);
             delete eh._myListenerId;
+        });
+    }
+
+    disconnect() {
+        this.eventHubs.forEach(eh=> {
             eh.disconnect();
         });
     }
@@ -423,6 +428,26 @@ class EventHub {
             result = result && eh._connected;
         }, false);
     }
+
+    registerTxEvent(eventId, cb) {
+        this.eventHubs.forEach(eh=> {
+            eh.registerTxEvent(eventId, cb);
+        });
+    }
+
+    unregisterTxEvent(eventId) {
+        this.eventHubs.forEach(eh=> {
+            eh.unregisterTxEvent(eventId);
+        });
+    }
+
+    setPeerAddr(peerEventAddr, options) {
+        this.eventHubs.forEach(eh=> {
+            eh.setPeerAddr(peerEventAddr, options);
+        });
+    }
+
+
 }
 
 

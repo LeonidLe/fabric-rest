@@ -166,7 +166,7 @@ function listen(){
  *
  */
 function disconnect(){
-    // eventhub.unregisterBlockEvent(eventhub._myListenerId);
+    eventhub.unregisterBlockEvent(eventhub._myListenerId);
     // delete eventhub._myListenerId;
     eventhub.disconnect();
 }
