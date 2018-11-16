@@ -7,8 +7,8 @@ const cryptoConfigDir = process.env.CRYPTO_CONFIG_DIR || '../artifacts/crypto-co
 const enrollId = process.env.ENROLL_ID || 'admin';
 const enrollSecret = process.env.ENROLL_SECRET || 'adminpw';
 // default to peer0.org1.example.com:7051 inside docker-compose or export ORGS='{"org1":"peer0.org1.example.com:7051","org2":"peer0.org2.example.com:7051"}'
-let orgs = process.env.ORGS || '"a":"localhost:7051"';
-let cas = process.env.CAS || '"a":"localhost:7054"';
+let ORGS = process.env.ORGS || `"${myorg}":"peer0.${myorg}.${domain}:7051"`;
+let CAS = process.env.CAS || `"${myorg}":"ca.${myorg}.${domain}:7054"`;
 
 const t = {
     name: 'Network',
@@ -20,8 +20,8 @@ function addOrg(t, org) {
         t.organizations = {};
     }
     t.organizations[org] = {
-        // mspid: `${org}MSP`,
-        mspid: `${org}`,
+        mspid: `${org}MSP`,
+        // mspid: `${org}`,
         peers: [
             `peer0.${org}.${domain}`
         ]
@@ -94,15 +94,15 @@ module.exports = function () {
     };
 
     try {
-        orgs = JSON.parse(orgs);
+        orgs = JSON.parse(ORGS);
     } catch(e) {
-        orgs = JSON.parse('{' + orgs + '}');
+        orgs = JSON.parse('{' + ORGS + '}');
     }
 
     try {
-        cas = JSON.parse(cas);
+        cas = JSON.parse(CAS);
     } catch(e) {
-        cas = JSON.parse('{' + cas + '}');
+        cas = JSON.parse('{' + CAS + '}');
     }
 
     Object.keys(orgs).forEach(k => {

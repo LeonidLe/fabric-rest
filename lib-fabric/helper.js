@@ -339,16 +339,29 @@ function newPeer(peerUrl) {
 }
 
 
+
+async function getChannel13(channelId, client, peer) {
+    let channel;
+    try {
+        channel = client.getChannel(channelId);
+    } catch (e) {
+        channel = client.newChannel(channelId);
+        channel.addPeer(peer);
+    }
+    await channel.initialize({discover: true, asLocalhost: false});
+    // logger.trace('channel', channel);
+    return channel;
+}
+
+
 /**
  * @param {url} peerUrl
  * @param {string} username
  * @param {string} orgID
  * @return {Promise<EventHub>}
  */
-function newEventHub(peerUrl, username, orgID) {
 
-  return getClientForOrg(username, orgID)
-    .then(client => {
+
 /*
       var peerInfo = _getPeerInfoByUrl(peerUrl, orgID);
       if (!peerInfo) {
@@ -364,18 +377,70 @@ function newEventHub(peerUrl, username, orgID) {
       });
 */
 
-      let peer = client.getPeersForOrg()[0];
-      return client.queryChannels(peer, true).then(resp=>{
-          let channels= resp.getChannels();
+class EventHub {
+    constructor() {
+        this.eventHubs=[];
+    }
 
-          channels.forEach(channel=>{
-              const channelEventHub = channel.newChannelEventHub(peer.getName());
-              channelEventHub.connect();
-          });
-      });
+    addChannelEventHub(eh) {
+        this.eventHubs.push(eh);
+    }
 
-      // return eventHub;
-    });
+    setTimeOut(timeout) {
+        this.eventHubs.forEach(eh=>{
+           // eh._ep._request_timeout = timeout;
+        });
+    }
+
+    registerBlockEvent(_onBlock, _onBlockError){
+        this.eventHubs.forEach(eh=>{
+            eh._myListenerId = eh.registerBlockEvent(_onBlock, _onBlockError);
+        });
+    }
+
+    connect() {
+        this.eventHubs.forEach(eh=>{
+            eh.connect();
+        });
+    }
+
+    setConnectTimer(waitTime){
+        this.eventHubs.forEach(eh=>{
+
+        });
+    }
+
+    disconnect() {
+        this.eventHubs.forEach(eh=> {
+            eh.unregisterBlockEvent(eh._myListenerId);
+            delete eh._myListenerId;
+            eh.disconnect();
+        });
+    }
+
+    isConnected() {
+        return this.eventHubs.reduce((result, eh) => {
+            result = result && eh._connected;
+        }, false);
+    }
+}
+
+
+async function newEventHub(peerUrl, username, orgID) {
+
+    let eventHub = new EventHub();
+    let client = await getClientForOrg(username, orgID);
+
+    let peer = client.getPeersForOrg()[0];
+    let resp = await client.queryChannels(peer, true);
+
+    let channelNames = resp.getChannels();
+    await Promise.all(channelNames.map(async (channelName) => {
+        let channel = await getChannel13(channelName.channel_id, client, peer);
+        const channelEventHub = channel.newChannelEventHub(peer.getName());
+        eventHub.addChannelEventHub(channelEventHub);
+    }));
+    return eventHub;
 }
 
 

@@ -1,6 +1,7 @@
 'use strict';
 var util = require('util');
 var EventEmitter = require('events');
+const _ = require('lodash');
 var helper = require('./helper.js');
 var logger = helper.getLogger('peer-listener');
 
@@ -103,12 +104,15 @@ function listen(){
       return helper.newEventHub(peer, _username, orgID)
         .then(function(_eventhub){
           eventhub = _eventhub;
-          eventhub._ep._request_timeout = 5000; // TODO: temp solution, move timeout to config
-          eventhub._myListenerId = eventhub.registerBlockEvent(_onBlock, _onBlockError);
+          // eventhub._ep._request_timeout = 5000; // TODO: temp solution, move timeout to config
+            eventhub.setTimeOut(5000);
 
+          // eventhub._myListenerId = eventhub.registerBlockEvent(_onBlock, _onBlockError);
+          eventhub.registerBlockEvent(_onBlock, _onBlockError);
           eventhub.connect();
-          eventhub._connectTimer = setInterval(_checkConnection.bind(eventhub), 1000); // TODO: socket connection check interval
-          eventhub._connectTimer.unref();
+
+          // eventhub._connectTimer = setInterval(_checkConnection.bind(eventhub), 1000); // TODO: socket connection check interval
+          // eventhub._connectTimer.unref();
           blockEvents.emit('connecting');
           // return eventhub;
         });
@@ -131,8 +135,8 @@ function listen(){
     //
     function _onBlock(block){
       logger.debug(util.format('(((((((((((( Got block event )))))))))))'));
-      logger.debug('Got block event', block.header.data_hash);
-
+      logger.debug('Got block event.Channel', _.get(block, "channel_id"), "Tx: ", _.get(block,"filtered_transactions[0].txid"));
+      _.set(block, "header.data_hash", _.get(block,"filtered_transactions[0].txid"));
       blockEvents.emit('block_success', block);
     }
 
@@ -142,12 +146,12 @@ function listen(){
       logger.error(e);
       blockEvents.emit('block_error', e);
 
-      if(!eventhub._connected){
+      if(!eventhub.isConnected()){
         logger.debug('disconnected');
         blockEvents.emit('disconnected');
       }
 
-      if(!eventhub._connected && !_wasConnectedAtStartup){
+      if(!eventhub.isConnected() && !_wasConnectedAtStartup){
         throw e;
       }
 
@@ -162,14 +166,14 @@ function listen(){
  *
  */
 function disconnect(){
-    eventhub.unregisterBlockEvent(eventhub._myListenerId);
-    delete eventhub._myListenerId;
+    // eventhub.unregisterBlockEvent(eventhub._myListenerId);
+    // delete eventhub._myListenerId;
     eventhub.disconnect();
 }
 
 
 function isConnected(){
-  return eventhub && eventhub._connected;
+  return eventhub && eventhub.isConnected();//_connected;
 }
 
 
