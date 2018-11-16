@@ -114,7 +114,7 @@ function listen(){
           // eventhub._connectTimer = setInterval(_checkConnection.bind(eventhub), 1000); // TODO: socket connection check interval
           // eventhub._connectTimer.unref();
           blockEvents.emit('connecting');
-          // return eventhub;
+          return eventhub;
         });
     }
 
