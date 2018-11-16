@@ -92,7 +92,7 @@ var instantiateChaincode = function(channelID, chaincodeName, chaincodeVersion, 
             // fail the test
             var deployId = tx_id.getTransactionID();
 
-            eh = client.newEventHub();
+            eh = channel.newEventHub();
             let data = fs.readFileSync(path.join(CONFIG_DIR, ORGS[org]['peer1']['tls_cacerts']));
             eh.setPeerAddr(ORGS[org]['peer1']['events'], {
                 pem: Buffer.from(data).toString(),
