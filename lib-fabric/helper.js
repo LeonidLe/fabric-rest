@@ -429,9 +429,9 @@ class EventHub {
         }, false);
     }
 
-    registerTxEvent(eventId, cb) {
+    registerTxEvent(eventId, onSuccess, onError) {
         this.eventHubs.forEach(eh=> {
-            eh.registerTxEvent(eventId, cb);
+            eh.registerTxEvent(eventId, onSuccess, onError);
         });
     }
 
