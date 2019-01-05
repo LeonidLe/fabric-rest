@@ -1,6 +1,6 @@
 
 FROM node:8-alpine
-# LABEL com.altoros.version="0.11"
+# LABEL com.fabric-rest.version="0.11"
 
 # Create app directory
 WORKDIR /usr/src/app

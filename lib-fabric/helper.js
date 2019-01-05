@@ -379,70 +379,70 @@ async function getChannel13(channelId, client, peer) {
 
 class EventHub {
     constructor() {
-        this.eventHubs=[];
+        this.channelEventHubs=[];
     }
 
     addChannelEventHub(eh) {
-        this.eventHubs.push(eh);
+        this.channelEventHubs.push(eh);
     }
 
     setTimeOut(timeout) {
-        this.eventHubs.forEach(eh=>{
+        this.channelEventHubs.forEach(eh=>{
            // eh._ep._request_timeout = timeout;
         });
     }
 
     registerBlockEvent(_onBlock, _onBlockError){
-        this.eventHubs.forEach(eh=>{
+        this.channelEventHubs.forEach(eh=>{
             eh._myListenerId = eh.registerBlockEvent(_onBlock, _onBlockError);
         });
     }
 
     connect() {
-        this.eventHubs.forEach(eh=>{
+        this.channelEventHubs.forEach(eh=>{
             eh.connect();
         });
     }
 
     setConnectTimer(waitTime){
-        this.eventHubs.forEach(eh=>{
+        this.channelEventHubs.forEach(eh=>{
 
         });
     }
 
     unregisterBlockEvent(){
-        this.eventHubs.forEach(eh=> {
+        this.channelEventHubs.forEach(eh=> {
             eh.unregisterBlockEvent(eh._myListenerId);
             delete eh._myListenerId;
         });
     }
 
     disconnect() {
-        this.eventHubs.forEach(eh=> {
+        this.channelEventHubs.forEach(eh=> {
             eh.disconnect();
         });
     }
 
     isConnected() {
-        return this.eventHubs.reduce((result, eh) => {
+        return this.channelEventHubs.reduce((result, eh) => {
             result = result && eh._connected;
         }, false);
     }
 
     registerTxEvent(eventId, onSuccess, onError) {
-        this.eventHubs.forEach(eh=> {
+        this.channelEventHubs.forEach(eh=> {
             eh.registerTxEvent(eventId, onSuccess, onError);
         });
     }
 
     unregisterTxEvent(eventId) {
-        this.eventHubs.forEach(eh=> {
+        this.channelEventHubs.forEach(eh=> {
             eh.unregisterTxEvent(eventId);
         });
     }
 
     setPeerAddr(peerEventAddr, options) {
-        this.eventHubs.forEach(eh=> {
+        this.channelEventHubs.forEach(eh=> {
             eh.setPeerAddr(peerEventAddr, options);
         });
     }
@@ -464,6 +464,7 @@ async function newEventHub(peerUrl, username, orgID) {
         let channel = await getChannel13(channelName.channel_id, client, peer);
         const channelEventHub = channel.newChannelEventHub(peer.getName());
         eventHub.addChannelEventHub(channelEventHub);
+        channelEventHub.connect();
     }));
     return eventHub;
 }
